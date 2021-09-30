@@ -55,6 +55,12 @@ contributions you make are **greatly appreciated**.
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## Roadmap
+
+1. Compression of grayscale images
+2. Provide Frobenius norm
+
+
 <!-- CONTACT -->
 
 ## Contact
