@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/color"
 	"math"
+	"sync"
 )
 
 // ImageCompression provide service for compression image.Image
@@ -47,13 +48,15 @@ func (im *ImageCompression) Compress(img image.Image) image.Image {
 
 // compressingImage is sub-function which decomposing RGBA slices and approximate by rank.
 // return compressed image.Image
-func (im *ImageCompression) compressingImage(width, height, rank int, redData, greenData, blueData, alphaData *[]float64) image.Image {
+func (im *ImageCompression) compressingImage(width, height, k int, redData, greenData, blueData, alphaData *[]float64) image.Image {
 	chRed, chGreen, chBlue, chAlpha := make(chan mat.Dense), make(chan mat.Dense), make(chan mat.Dense), make(chan mat.Dense)
+	var wg sync.WaitGroup
+	wg.Add(4)
 
-	go im.approximateImgChannel(width, height, rank, redData, chRed)
-	go im.approximateImgChannel(width, height, rank, greenData, chGreen)
-	go im.approximateImgChannel(width, height, rank, blueData, chBlue)
-	go im.approximateImgChannel(width, height, rank, alphaData, chAlpha)
+	go im.approximateImgChannel(width, height, k, redData, chRed, &wg)
+	go im.approximateImgChannel(width, height, k, greenData, chGreen, &wg)
+	go im.approximateImgChannel(width, height, k, blueData, chBlue, &wg)
+	go im.approximateImgChannel(width, height, k, alphaData, chAlpha, &wg)
 
 	var compressRedChannel, compressGreenChannel, compressBlueChannel, compressAlphaChannel mat.Dense
 
@@ -61,6 +64,8 @@ func (im *ImageCompression) compressingImage(width, height, rank int, redData, g
 	compressGreenChannel = <-chGreen
 	compressBlueChannel = <-chBlue
 	compressAlphaChannel = <-chAlpha
+
+	wg.Wait()
 
 	var newImg = image.NewRGBA(image.Rect(0, 0, width, height))
 	var col color.Color
@@ -79,7 +84,8 @@ func (im *ImageCompression) compressingImage(width, height, rank int, redData, g
 	return newImg
 }
 
-func (im *ImageCompression) approximateImgChannel(width, height, rank int, imgChannel *[]float64, ch chan mat.Dense) {
+func (im *ImageCompression) approximateImgChannel(width, height, rank int, imgChannel *[]float64, ch chan mat.Dense, wg *sync.WaitGroup) {
+	defer wg.Done()
 	ch <- approximate(mat.NewDense(height, width, *imgChannel), rank)
 }
 
