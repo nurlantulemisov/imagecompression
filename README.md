@@ -27,7 +27,7 @@ To get a local copy up and running follow these simple steps.
 
 1. Install vendor
    ```sh
-   go get https://github.com/nurlantulemisov/imagecompression
+   go get -u github.com/nurlantulemisov/imagecompression
    ```
 
 <!-- USAGE EXAMPLES -->
