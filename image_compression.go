@@ -30,7 +30,7 @@ func (im *ImageCompression) Compress(img image.Image) image.Image {
 
 	width, height := img.Bounds().Max.X, img.Bounds().Max.Y
 	rank := im.toMode(width, height)
-	fmt.Println(rank)
+
 	var redData, greenData, blueData, alphaData []float64
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
