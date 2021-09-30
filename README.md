@@ -1,3 +1,5 @@
+[![Go](https://github.com/nurlantulemisov/imagecompression/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/nurlantulemisov/imagecompression/actions/workflows/go.yml)
+[![Coverage Status](https://coveralls.io/repos/github/nurlantulemisov/imagecompression/badge.svg)](https://coveralls.io/github/nurlantulemisov/imagecompression)
 ## SVD image compression
 
 An implementation image compression using SVD decomposition on Go
