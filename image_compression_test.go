@@ -88,10 +88,23 @@ func saveImage(img image.Image, path string) {
 	if err != nil {
 		log.Fatalf("error creating file: %s", err)
 	}
-	defer f.Close()
-	jpeg.Encode(f, img, nil)
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Fatalf("error creating file: %s", err)
+		}
+	}(f)
+
+	err = jpeg.Encode(f, img, nil)
+	if err != nil {
+		return
+	}
 }
 
 func removeImage(path string) {
-	os.Remove(path)
+	err := os.Remove(path)
+	if err != nil {
+		log.Fatalf("error creating file: %s", err)
+		return
+	}
 }
