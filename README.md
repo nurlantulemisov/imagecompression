@@ -9,6 +9,16 @@ An implementation image compression using SVD decomposition on Go
 * [Go 1.17]()
 * [Gonum](https://github.com/gonum/gonum)
 
+## Compression examples
+
+Header | Image
+-------|-----------------------------------
+| Original    | ![](fixtures/test10x10.jpeg)
+| Ratio 10%   | ![](fixtures/test10x10_compressed10.jpeg)|
+| Ratio 50%   | ![](fixtures/test10x10_compressed50.jpeg)
+| Ratio 80%   | ![](fixtures/test10x10_compressed80.jpeg)|
+| Ratio 99%   | ![](fixtures/test10x10_compressed99.jpeg)|
+
 ## Getting Started
 
 To get a local copy up and running follow these simple steps.
