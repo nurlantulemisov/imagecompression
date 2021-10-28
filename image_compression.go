@@ -57,26 +57,44 @@ func (im *ImageCompression) compressingImage(width, height, rank int, redData, g
 
 	var compressRedChannel, compressGreenChannel, compressBlueChannel, compressAlphaChannel mat.Dense
 
+	var newImg = image.NewRGBA(image.Rect(0, 0, width, height))
+	var col color.Color
+
 	compressRedChannel = <-chRed
 	compressGreenChannel = <-chGreen
 	compressBlueChannel = <-chBlue
 	compressAlphaChannel = <-chAlpha
 
-	var newImg = image.NewRGBA(image.Rect(0, 0, width, height))
-	var col color.Color
+	redMaxValue := mat.Max(&compressRedChannel)
+	greenMaxValue := mat.Max(&compressGreenChannel)
+	blueMaxValue := mat.Max(&compressBlueChannel)
+	alphaMaxValue := mat.Max(&compressAlphaChannel)
 
-	for r := 0; r < height; r++ {
-		for c := 0; c < width; c++ {
+	for h := 0; h < height; h++ {
+		for w := 0; w < width; w++ {
 			col = color.RGBA{
-				R: uint8(compressRedChannel.At(r, c)),
-				G: uint8(compressGreenChannel.At(r, c)),
-				B: uint8(compressBlueChannel.At(r, c)),
-				A: uint8(compressAlphaChannel.At(r, c)),
+				R: uint8(normalizeImageValue(compressRedChannel.At(h, w), redMaxValue)),
+				G: uint8(normalizeImageValue(compressGreenChannel.At(h, w), greenMaxValue)),
+				B: uint8(normalizeImageValue(compressBlueChannel.At(h, w), blueMaxValue)),
+				A: uint8(normalizeImageValue(compressAlphaChannel.At(h, w), alphaMaxValue)),
 			}
-			newImg.Set(c, r, col)
+			newImg.Set(w, h, col)
 		}
 	}
 	return newImg
+}
+
+// normalizeImageValue ensures that images that have a small dynamic range in your image remain small,
+// and they're not inadvertently normalized so that they become gray
+func normalizeImageValue(at float64, maxValue float64) float64 {
+	normalize := at / maxValue
+	if normalize > 1 {
+		return 255
+	}
+	if normalize < 0 {
+		return 0
+	}
+	return 255 * normalize
 }
 
 func (im *ImageCompression) approximateImgChannel(width, height, rank int, imgChannel *[]float64, ch chan mat.Dense) {
