@@ -11,12 +11,13 @@ An implementation image compression using SVD decomposition on Go
 
 ## Compression examples
 
-Header | Image
+Compress ratio | Image
 -------|-----------------------------------
 | Original    | ![](fixtures/test10x10.jpeg)
 | Ratio 10%   | ![](fixtures/test10x10_compressed10.jpeg)|
 | Ratio 50%   | ![](fixtures/test10x10_compressed50.jpeg)
 | Ratio 80%   | ![](fixtures/test10x10_compressed80.jpeg)|
+| Ratio 90%   | ![](fixtures/test10x10_compressed90.jpeg)|
 | Ratio 99%   | ![](fixtures/test10x10_compressed99.jpeg)|
 
 ## Getting Started
@@ -25,7 +26,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Installation
 
-1. Install vendor
+Install vendor
    ```sh
    go get -u github.com/nurlantulemisov/imagecompression
    ```
@@ -35,11 +36,48 @@ To get a local copy up and running follow these simple steps.
 ### Simple usage
 
 ```Go
-file, _ := os.Open("tmp/image.jpeg")
-img, _ := jpeg.Decode(file)
+package main
 
-compressing, _ := image_compression.New(50) // create with percent ratio
-compressingImage := compressing.Compress(img)
+import (
+   compression "github.com/nurlantulemisov/imagecompression"
+   "image/png"
+   "log"
+   "os"
+)
+
+func main() {
+   file, err := os.Open("examples/simple_usage/tmp/test.png")
+
+   if err != nil {
+      log.Fatalf(err.Error())
+   }
+
+   img, err := png.Decode(file)
+
+   if err != nil {
+      log.Fatalf(err.Error())
+   }
+   
+   compressing, _ := compression.New(95)
+   compressingImage := compressing.Compress(img)
+
+   f, err := os.Create("examples/simple_usage/tmp/compressed-test.png")
+   if err != nil {
+      log.Fatalf("error creating file: %s", err)
+   }
+   defer func(f *os.File) {
+      err := f.Close()
+      if err != nil {
+         log.Fatalf(err.Error())
+      }
+   }(f)
+
+   err = png.Encode(f, compressingImage)
+   if err != nil {
+      log.Fatalf(err.Error())
+   }
+}
+
 ```
 
 <!-- CONTRIBUTING -->
